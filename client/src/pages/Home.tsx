@@ -21,7 +21,7 @@ export default function Home() {
       category: "Web Design",
       description: "Complete redesign of an e-commerce platform focusing on user experience and conversion optimization.",
       image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663030114307/azBYHo3tqLmR2mfCiqDWhw/portfolio-accent-1-QFjdoPKLmPF5hjSVaxtf5H.webp",
-      year: "2024"
+      year: "2026"
     },
     {
       id: 2,
@@ -29,15 +29,7 @@ export default function Home() {
       category: "UI/UX Design",
       description: "Designed a comprehensive dashboard system for a B2B SaaS platform with real-time analytics.",
       image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663030114307/azBYHo3tqLmR2mfCiqDWhw/portfolio-accent-2-gMKKNwtmwr5Koo6sTYwQdL.webp",
-      year: "2024"
-    },
-    {
-      id: 3,
-      title: "Mobile App Interface",
-      category: "Mobile Design",
-      description: "Intuitive mobile app interface for a fitness tracking application with seamless user flows.",
-      image: "https://d2xsxph8kpxj0f.cloudfront.net/310419663030114307/azBYHo3tqLmR2mfCiqDWhw/portfolio-accent-1-QFjdoPKLmPF5hjSVaxtf5H.webp",
-      year: "2023"
+      year: "2026"
     }
   ];
 
@@ -292,20 +284,24 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <Button 
-                className="bg-accent hover:bg-accent/90 text-accent-foreground"
-                size="lg"
-              >
-                <Mail className="mr-2 w-4 h-4" />
-                Send Me an Email
-              </Button>
-              <Button 
-                variant="outline"
-                className="border-accent text-accent hover:bg-accent/10"
-                size="lg"
-              >
-                Schedule a Call
-              </Button>
+              <a href="mailto:mahmodelsaigh@gmail.com">
+                <Button 
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                  size="lg"
+                >
+                  <Mail className="mr-2 w-4 h-4" />
+                  Send Me an Email
+                </Button>
+              </a>
+              <a href="https://wa.me/201126251838" target="_blank" rel="noopener noreferrer">
+                <Button 
+                  variant="outline"
+                  className="border-accent text-accent hover:bg-accent/10"
+                  size="lg"
+                >
+                  💬 WhatsApp: +201126251838
+                </Button>
+              </a>
             </div>
           </div>
         </div>
@@ -335,7 +331,7 @@ export default function Home() {
             </div>
 
             <p className="text-sm text-muted-foreground">
-              © 2024 All rights reserved.
+              © 2026 All rights reserved.
             </p>
           </div>
         </div>
