@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -34,8 +34,8 @@ import {
 } from "lucide-react";
 
 /**
- * SaaS Dashboard - Interactive Demo
- * Features: Data visualization, responsive design, interactive charts, real-time metrics
+ * SaaS Dashboard - Interactive Demo with Real-Time Updates
+ * Features: Live data updates, smooth animations, responsive design, interactive charts
  */
 
 interface DashboardMetric {
@@ -55,7 +55,7 @@ interface ChartDataPoint {
   percentage?: number;
 }
 
-const REVENUE_DATA: ChartDataPoint[] = [
+const REVENUE_DATA_BASE: ChartDataPoint[] = [
   { name: "Jan", value: 4000, revenue: 2400, users: 2210 },
   { name: "Feb", value: 3000, revenue: 1398, users: 2290 },
   { name: "Mar", value: 2000, revenue: 9800, users: 2000 },
@@ -64,7 +64,7 @@ const REVENUE_DATA: ChartDataPoint[] = [
   { name: "Jun", value: 2390, revenue: 3800, users: 2250 },
 ];
 
-const CONVERSION_DATA: ChartDataPoint[] = [
+const CONVERSION_DATA_BASE: ChartDataPoint[] = [
   { name: "Week 1", conversions: 65 },
   { name: "Week 2", conversions: 78 },
   { name: "Week 3", conversions: 72 },
@@ -79,7 +79,7 @@ const USER_DISTRIBUTION: ChartDataPoint[] = [
   { name: "Enterprise", percentage: 20 },
 ];
 
-const TRAFFIC_DATA: ChartDataPoint[] = [
+const TRAFFIC_DATA_BASE: ChartDataPoint[] = [
   { name: "Mon", value: 4000 },
   { name: "Tue", value: 3000 },
   { name: "Wed", value: 2000 },
@@ -91,41 +91,87 @@ const TRAFFIC_DATA: ChartDataPoint[] = [
 
 const COLORS = ["#d97706", "#f59e0b", "#10b981"];
 
+// Helper function to add variation to data for real-time effect
+const addVariation = (data: ChartDataPoint[], variation: number = 0.1) => {
+  return data.map((point) => ({
+    ...point,
+    value: point.value ? Math.round(point.value * (1 + (Math.random() - 0.5) * variation)) : undefined,
+    revenue: point.revenue ? Math.round(point.revenue * (1 + (Math.random() - 0.5) * variation)) : undefined,
+    users: point.users ? Math.round(point.users * (1 + (Math.random() - 0.5) * variation)) : undefined,
+    conversions: point.conversions ? Math.round(point.conversions * (1 + (Math.random() - 0.5) * variation)) : undefined,
+  }));
+};
+
 export default function SaasDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [timeRange, setTimeRange] = useState("30d");
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
+  const [revenueData, setRevenueData] = useState(REVENUE_DATA_BASE);
+  const [conversionData, setConversionData] = useState(CONVERSION_DATA_BASE);
+  const [trafficData, setTrafficData] = useState(TRAFFIC_DATA_BASE);
+  const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
+  const [animationKey, setAnimationKey] = useState(0);
 
-  const metrics: DashboardMetric[] = [
-    {
-      label: "Total Revenue",
-      value: "$45,231.89",
-      change: 20.1,
-      icon: <DollarSign className="w-6 h-6" />,
-      color: "bg-blue-50 text-blue-600",
-    },
-    {
-      label: "Active Users",
-      value: "12,543",
-      change: 15.3,
-      icon: <Users className="w-6 h-6" />,
-      color: "bg-green-50 text-green-600",
-    },
-    {
-      label: "Conversion Rate",
-      value: "3.24%",
-      change: 4.3,
-      icon: <TrendingUp className="w-6 h-6" />,
-      color: "bg-purple-50 text-purple-600",
-    },
-    {
-      label: "System Status",
-      value: "99.8%",
-      change: 0.1,
-      icon: <Activity className="w-6 h-6" />,
-      color: "bg-orange-50 text-orange-600",
-    },
-  ];
+  // Initialize metrics
+  useEffect(() => {
+    const initialMetrics: DashboardMetric[] = [
+      {
+        label: "Total Revenue",
+        value: "$45,231.89",
+        change: 20.1,
+        icon: <DollarSign className="w-6 h-6" />,
+        color: "bg-blue-50 text-blue-600",
+      },
+      {
+        label: "Active Users",
+        value: "12,543",
+        change: 15.3,
+        icon: <Users className="w-6 h-6" />,
+        color: "bg-green-50 text-green-600",
+      },
+      {
+        label: "Conversion Rate",
+        value: "3.24%",
+        change: 4.3,
+        icon: <TrendingUp className="w-6 h-6" />,
+        color: "bg-purple-50 text-purple-600",
+      },
+      {
+        label: "System Status",
+        value: "99.8%",
+        change: 0.1,
+        icon: <Activity className="w-6 h-6" />,
+        color: "bg-orange-50 text-orange-600",
+      },
+    ];
+    setMetrics(initialMetrics);
+  }, []);
+
+  // Real-time data update effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Update chart data with slight variations
+      setRevenueData(addVariation(REVENUE_DATA_BASE, 0.08));
+      setConversionData(addVariation(CONVERSION_DATA_BASE, 0.12));
+      setTrafficData(addVariation(TRAFFIC_DATA_BASE, 0.1));
+      
+      // Update metrics with slight variations
+      setMetrics((prevMetrics) =>
+        prevMetrics.map((metric) => {
+          const changeVariation = (Math.random() - 0.5) * 2;
+          return {
+            ...metric,
+            change: Math.max(0, metric.change + changeVariation),
+          };
+        })
+      );
+
+      // Trigger animation key change for smooth transitions
+      setAnimationKey((prev) => prev + 1);
+    }, 3000); // Update every 3 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -133,9 +179,15 @@ export default function SaasDashboard() {
       <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 hover:bg-secondary rounded-lg transition-colors lg:hidden"
+            >
+              {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
             <a
               href="/"
-              className="flex items-center gap-2 text-accent hover:text-accent/80"
+              className="flex items-center gap-2 text-accent hover:text-accent/80 transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
               Back to Portfolio
@@ -148,7 +200,7 @@ export default function SaasDashboard() {
             <button className="p-2 hover:bg-secondary rounded-lg transition-colors">
               <Settings className="w-5 h-5" />
             </button>
-            <button className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center">
+            <button className="w-10 h-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center hover:bg-accent/90 transition-colors">
               <User className="w-5 h-5" />
             </button>
           </div>
@@ -196,7 +248,7 @@ export default function SaasDashboard() {
                   Dashboard
                 </h1>
                 <p className="text-muted-foreground">
-                  Welcome back! Here's your performance overview.
+                  Welcome back! Here's your performance overview. Data updates every 3 seconds.
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -220,101 +272,83 @@ export default function SaasDashboard() {
               </div>
             </div>
 
-            {/* Key Metrics */}
+            {/* Metrics Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {metrics.map((metric, index) => (
                 <button
                   key={index}
-                  onClick={() =>
-                    setSelectedMetric(
-                      selectedMetric === metric.label ? null : metric.label
-                    )
-                  }
-                  className={`bg-card rounded-lg border border-border p-6 transition-all hover:shadow-lg ${
+                  onClick={() => setSelectedMetric(metric.label)}
+                  className={`p-6 rounded-lg border transition-all duration-500 cursor-pointer transform hover:scale-105 ${
                     selectedMetric === metric.label
-                      ? "ring-2 ring-accent border-accent"
-                      : ""
+                      ? "border-accent bg-accent/5 shadow-lg"
+                      : "border-border hover:border-accent/50"
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-start justify-between mb-4">
                     <div className={`p-3 rounded-lg ${metric.color}`}>
                       {metric.icon}
                     </div>
-                    <span
-                      className={`text-sm font-bold ${
-                        metric.change > 0 ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {metric.change > 0 ? "+" : ""}
-                      {metric.change}%
-                    </span>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-green-600">
+                        +{metric.change.toFixed(1)}%
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-muted-foreground text-sm mb-1">
+                  <div className="text-sm text-muted-foreground mb-1">
                     {metric.label}
-                  </p>
-                  <p className="text-2xl font-bold">{metric.value}</p>
+                  </div>
+                  <div className="text-2xl font-bold">{metric.value}</div>
                 </button>
               ))}
             </div>
 
             {/* Charts Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Revenue Chart */}
-              <div className="lg:col-span-2 bg-card rounded-lg border border-border p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Revenue Trend */}
+              <div className="bg-card border border-border rounded-lg p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2
-                    className="text-lg font-bold"
-                    style={{ fontFamily: "var(--font-display)" }}
-                  >
-                    Revenue Trend
-                  </h2>
-                  <button className="p-2 hover:bg-secondary rounded-lg transition-colors">
-                    <Filter className="w-4 h-4" />
-                  </button>
+                  <h2 className="text-lg font-bold">Revenue Trend</h2>
+                  <div className="animate-pulse w-2 h-2 bg-green-500 rounded-full" />
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={REVENUE_DATA}>
+                  <AreaChart
+                    data={revenueData}
+                    key={`revenue-${animationKey}`}
+                  >
                     <defs>
-                      <linearGradient
-                        id="colorRevenue"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop offset="5%" stopColor="#d97706" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#d97706" stopOpacity={0} />
+                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#d4af37" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#d4af37" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="name" stroke="var(--muted-foreground)" />
-                    <YAxis stroke="var(--muted-foreground)" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
                         borderRadius: "8px",
                       }}
                     />
                     <Area
                       type="monotone"
-                      dataKey="revenue"
-                      stroke="#d97706"
+                      dataKey="value"
+                      stroke="#d4af37"
                       fillOpacity={1}
                       fill="url(#colorRevenue)"
+                      animationDuration={800}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
-              {/* User Distribution */}
-              <div className="bg-card rounded-lg border border-border p-6">
-                <h2
-                  className="text-lg font-bold mb-6"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  Plan Distribution
-                </h2>
+              {/* Plan Distribution */}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold">Plan Distribution</h2>
+                  <div className="animate-pulse w-2 h-2 bg-green-500 rounded-full" />
+                </div>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
@@ -322,48 +356,39 @@ export default function SaasDashboard() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percentage }) =>
-                        `${name}: ${percentage}%`
-                      }
+                      label={({ name, percentage }) => `${name}: ${percentage}%`}
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="percentage"
+                      animationDuration={800}
                     >
                       {COLORS.map((color, index) => (
                         <Cell key={`cell-${index}`} fill={color} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
-                        borderRadius: "8px",
-                      }}
-                    />
+                    <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-            </div>
 
-            {/* Bottom Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Conversion Rate */}
-              <div className="bg-card rounded-lg border border-border p-6">
-                <h2
-                  className="text-lg font-bold mb-6"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  Conversion Rate
-                </h2>
-                <ResponsiveContainer width="100%" height={250}>
-                  <LineChart data={CONVERSION_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="name" stroke="var(--muted-foreground)" />
-                    <YAxis stroke="var(--muted-foreground)" />
+              <div className="bg-card border border-border rounded-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold">Conversion Rate</h2>
+                  <div className="animate-pulse w-2 h-2 bg-green-500 rounded-full" />
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart
+                    data={conversionData}
+                    key={`conversion-${animationKey}`}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
                         borderRadius: "8px",
                       }}
                     />
@@ -374,91 +399,72 @@ export default function SaasDashboard() {
                       strokeWidth={2}
                       dot={{ fill: "#10b981", r: 4 }}
                       activeDot={{ r: 6 }}
+                      animationDuration={800}
                     />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
 
-              {/* Traffic */}
-              <div className="bg-card rounded-lg border border-border p-6">
-                <h2
-                  className="text-lg font-bold mb-6"
-                  style={{ fontFamily: "var(--font-display)" }}
-                >
-                  Weekly Traffic
-                </h2>
-                <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={TRAFFIC_DATA}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                    <XAxis dataKey="name" stroke="var(--muted-foreground)" />
-                    <YAxis stroke="var(--muted-foreground)" />
+              {/* Weekly Traffic */}
+              <div className="bg-card border border-border rounded-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold">Weekly Traffic</h2>
+                  <div className="animate-pulse w-2 h-2 bg-green-500 rounded-full" />
+                </div>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={trafficData}
+                    key={`traffic-${animationKey}`}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "var(--card)",
-                        border: "1px solid var(--border)",
+                        backgroundColor: "#fff",
+                        border: "1px solid #e5e7eb",
                         borderRadius: "8px",
                       }}
                     />
-                    <Bar dataKey="value" fill="#f59e0b" radius={[8, 8, 0, 0]} />
+                    <Bar
+                      dataKey="value"
+                      fill="#f59e0b"
+                      radius={[8, 8, 0, 0]}
+                      animationDuration={800}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-card rounded-lg border border-border p-6">
-              <h2
-                className="text-lg font-bold mb-6"
-                style={{ fontFamily: "var(--font-display)" }}
-              >
-                Recent Activity
-              </h2>
+            <div className="bg-card border border-border rounded-lg p-6">
+              <h2 className="text-lg font-bold mb-6">Recent Activity</h2>
               <div className="space-y-4">
                 {[
-                  {
-                    action: "New user signup",
-                    user: "John Doe",
-                    time: "2 hours ago",
-                  },
-                  {
-                    action: "Payment received",
-                    user: "$1,200 from Acme Corp",
-                    time: "4 hours ago",
-                  },
-                  {
-                    action: "Plan upgraded",
-                    user: "Sarah Smith",
-                    time: "6 hours ago",
-                  },
-                  {
-                    action: "Report generated",
-                    user: "Monthly Analytics",
-                    time: "1 day ago",
-                  },
+                  { action: "New user signup", user: "John Doe", time: "2 hours ago" },
+                  { action: "Payment received", user: "$1,200 from Acme Corp", time: "4 hours ago" },
+                  { action: "Plan upgraded", user: "Sarah Smith", time: "6 hours ago" },
+                  { action: "Report generated", user: "Monthly Analytics", time: "1 day ago" },
                 ].map((activity, index) => (
                   <div
                     key={index}
-                    className="flex items-center justify-between py-3 border-b border-border last:border-0"
+                    className="flex items-center justify-between p-4 rounded-lg hover:bg-secondary transition-colors"
                   >
                     <div>
                       <p className="font-medium">{activity.action}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {activity.user}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{activity.user}</p>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {activity.time}
-                    </span>
+                    <p className="text-sm text-muted-foreground">{activity.time}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="text-center py-8 border-t border-border">
-              <p className="text-sm text-muted-foreground">
-                This is an interactive demo showcasing React.js data visualization
-                capabilities and responsive dashboard design patterns.
+            <div className="text-center text-sm text-muted-foreground py-8">
+              <p>
+                This is an interactive demo showcasing React.js data visualization capabilities and responsive dashboard design patterns.
               </p>
             </div>
           </div>
