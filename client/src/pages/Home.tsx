@@ -256,7 +256,7 @@ export default function Home() {
 
             <div className="space-y-6 text-lg text-muted-foreground leading-relaxed">
               <p>
-                With over 5 years of experience in web design and development, I've had the privilege of working with diverse clients ranging from startups to established enterprises. My passion lies in creating intuitive, beautiful digital solutions that solve real problems.
+                I'm a passionate web developer dedicated to creating intuitive, beautiful digital solutions that solve real problems. My focus is on building high-quality web experiences that combine elegant design with robust functionality.
               </p>
 
               <p>
