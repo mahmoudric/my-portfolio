@@ -125,9 +125,9 @@ export default function SaasDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative z-0">
       {/* Back Button */}
-      <div className="fixed top-4 left-4 z-50">
+      <div className="fixed top-4 left-4 z-40 pointer-events-auto">
         <a
           href="/"
           className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg hover:bg-secondary transition-colors text-sm font-medium"
@@ -137,7 +137,7 @@ export default function SaasDashboard() {
         </a>
       </div>
 
-      <div className="flex h-screen pt-20">
+      <div className="flex h-screen pt-20 relative z-0">
         {/* Sidebar */}
         <div
           className={`${
@@ -180,8 +180,11 @@ export default function SaasDashboard() {
                 {(["7d", "30d", "90d", "1y"] as const).map((range) => (
                   <button
                     key={range}
-                    onClick={() => setTimeRange(range)}
-                    className={`px-6 py-2 rounded-md font-medium text-sm transition-all ${
+                    onClick={() => {
+                      console.log(`Changing time range to: ${range}`);
+                      setTimeRange(range);
+                    }}
+                    className={`px-6 py-2 rounded-md font-medium text-sm transition-all cursor-pointer z-10 relative ${
                       timeRange === range
                         ? "bg-accent text-accent-foreground shadow-md"
                         : "text-muted-foreground hover:text-foreground hover:bg-secondary"
@@ -199,8 +202,11 @@ export default function SaasDashboard() {
               </div>
 
               <button
-                onClick={handleExport}
-                className="flex items-center gap-2 px-6 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-all font-medium shadow-sm hover:shadow-md"
+                onClick={() => {
+                  console.log('Export button clicked');
+                  handleExport();
+                }}
+                className="flex items-center gap-2 px-6 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-all font-medium shadow-sm hover:shadow-md cursor-pointer z-10 relative"
               >
                 <Download className="w-4 h-4" />
                 Export
