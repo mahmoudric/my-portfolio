@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import {
   BarChart,
@@ -24,7 +23,6 @@ import {
   DollarSign,
   Activity,
   Download,
-  Filter,
   Calendar,
   Settings,
   Bell,
@@ -34,8 +32,8 @@ import {
 } from "lucide-react";
 
 /**
- * SaaS Dashboard - Interactive Demo with Real-Time Updates
- * Features: Live data updates, smooth animations, responsive design, interactive charts
+ * SaaS Dashboard - Professional Demo with Time Range Filtering
+ * Features: Time range filtering, dynamic data updates, smooth animations, responsive design
  */
 
 interface DashboardMetric {
@@ -55,23 +53,135 @@ interface ChartDataPoint {
   percentage?: number;
 }
 
-const REVENUE_DATA_BASE: ChartDataPoint[] = [
-  { name: "Jan", value: 4000, revenue: 2400, users: 2210 },
-  { name: "Feb", value: 3000, revenue: 1398, users: 2290 },
-  { name: "Mar", value: 2000, revenue: 9800, users: 2000 },
-  { name: "Apr", value: 2780, revenue: 3908, users: 2108 },
-  { name: "May", value: 1890, revenue: 4800, users: 2200 },
-  { name: "Jun", value: 2390, revenue: 3800, users: 2250 },
-];
-
-const CONVERSION_DATA_BASE: ChartDataPoint[] = [
-  { name: "Week 1", conversions: 65 },
-  { name: "Week 2", conversions: 78 },
-  { name: "Week 3", conversions: 72 },
-  { name: "Week 4", conversions: 85 },
-  { name: "Week 5", conversions: 92 },
-  { name: "Week 6", conversions: 88 },
-];
+// Data for different time ranges
+const DATA_BY_RANGE = {
+  "7d": {
+    revenue: [
+      { name: "Mon", value: 3200, revenue: 1800, users: 1200 },
+      { name: "Tue", value: 2800, revenue: 1500, users: 1100 },
+      { name: "Wed", value: 3500, revenue: 2100, users: 1350 },
+      { name: "Thu", value: 4100, revenue: 2400, users: 1500 },
+      { name: "Fri", value: 3900, revenue: 2200, users: 1450 },
+      { name: "Sat", value: 2600, revenue: 1400, users: 950 },
+      { name: "Sun", value: 2900, revenue: 1600, users: 1050 },
+    ],
+    conversion: [
+      { name: "Day 1", conversions: 45 },
+      { name: "Day 2", conversions: 52 },
+      { name: "Day 3", conversions: 48 },
+      { name: "Day 4", conversions: 61 },
+      { name: "Day 5", conversions: 58 },
+      { name: "Day 6", conversions: 42 },
+      { name: "Day 7", conversions: 55 },
+    ],
+    traffic: [
+      { name: "Mon", value: 2400 },
+      { name: "Tue", value: 2100 },
+      { name: "Wed", value: 2800 },
+      { name: "Thu", value: 3200 },
+      { name: "Fri", value: 2900 },
+      { name: "Sat", value: 1800 },
+      { name: "Sun", value: 2200 },
+    ],
+    metrics: {
+      revenue: "$28,500",
+      revenueChange: 18.5,
+      users: "8,450",
+      usersChange: 12.3,
+      conversion: "2.85%",
+      conversionChange: 3.2,
+      status: "99.9%",
+      statusChange: 0.1,
+    },
+  },
+  "30d": {
+    revenue: [
+      { name: "Week 1", value: 12500, revenue: 7200, users: 4500 },
+      { name: "Week 2", value: 13200, revenue: 7800, users: 4800 },
+      { name: "Week 3", value: 11800, revenue: 6900, users: 4200 },
+      { name: "Week 4", value: 14100, revenue: 8400, users: 5100 },
+    ],
+    conversion: [
+      { name: "Week 1", conversions: 65 },
+      { name: "Week 2", conversions: 72 },
+      { name: "Week 3", conversions: 68 },
+      { name: "Week 4", conversions: 78 },
+    ],
+    traffic: [
+      { name: "Week 1", value: 8500 },
+      { name: "Week 2", value: 9200 },
+      { name: "Week 3", value: 8100 },
+      { name: "Week 4", value: 9800 },
+    ],
+    metrics: {
+      revenue: "$118,450",
+      revenueChange: 20.1,
+      users: "38,500",
+      usersChange: 15.3,
+      conversion: "3.24%",
+      conversionChange: 4.3,
+      status: "99.8%",
+      statusChange: 0.1,
+    },
+  },
+  "90d": {
+    revenue: [
+      { name: "Jan", value: 28000, revenue: 16200, users: 10500 },
+      { name: "Feb", value: 32000, revenue: 18500, users: 12000 },
+      { name: "Mar", value: 35500, revenue: 20800, users: 13500 },
+    ],
+    conversion: [
+      { name: "Jan", conversions: 72 },
+      { name: "Feb", conversions: 78 },
+      { name: "Mar", conversions: 85 },
+    ],
+    traffic: [
+      { name: "Jan", value: 22000 },
+      { name: "Feb", value: 25500 },
+      { name: "Mar", value: 28000 },
+    ],
+    metrics: {
+      revenue: "$325,800",
+      revenueChange: 28.5,
+      users: "92,500",
+      usersChange: 22.8,
+      conversion: "3.65%",
+      conversionChange: 6.2,
+      status: "99.7%",
+      statusChange: 0.2,
+    },
+  },
+  "1y": {
+    revenue: [
+      { name: "Q1", value: 95500, revenue: 55500, users: 36000 },
+      { name: "Q2", value: 102000, revenue: 59200, users: 38500 },
+      { name: "Q3", value: 98500, revenue: 57100, users: 37000 },
+      { name: "Q4", value: 115000, revenue: 66800, users: 42500 },
+    ],
+    conversion: [
+      { name: "Q1", conversions: 75 },
+      { name: "Q2", conversions: 82 },
+      { name: "Q3", conversions: 78 },
+      { name: "Q4", conversions: 88 },
+    ],
+    traffic: [
+      { name: "Q1", value: 65000 },
+      { name: "Q2", value: 72000 },
+      { name: "Q3", value: 68000 },
+      { name: "Q4", value: 78000 },
+    ],
+    metrics: {
+      revenue: "$1,245,600",
+      revenueChange: 35.2,
+      users: "285,000",
+      usersChange: 32.5,
+      conversion: "3.82%",
+      conversionChange: 8.1,
+      status: "99.6%",
+      statusChange: 0.3,
+    },
+  },
+};
 
 const USER_DISTRIBUTION: ChartDataPoint[] = [
   { name: "Free Plan", percentage: 45 },
@@ -79,99 +189,56 @@ const USER_DISTRIBUTION: ChartDataPoint[] = [
   { name: "Enterprise", percentage: 20 },
 ];
 
-const TRAFFIC_DATA_BASE: ChartDataPoint[] = [
-  { name: "Mon", value: 4000 },
-  { name: "Tue", value: 3000 },
-  { name: "Wed", value: 2000 },
-  { name: "Thu", value: 2780 },
-  { name: "Fri", value: 1890 },
-  { name: "Sat", value: 2390 },
-  { name: "Sun", value: 3490 },
-];
-
 const COLORS = ["#d97706", "#f59e0b", "#10b981"];
-
-// Helper function to add variation to data for real-time effect
-const addVariation = (data: ChartDataPoint[], variation: number = 0.1) => {
-  return data.map((point) => ({
-    ...point,
-    value: point.value ? Math.round(point.value * (1 + (Math.random() - 0.5) * variation)) : undefined,
-    revenue: point.revenue ? Math.round(point.revenue * (1 + (Math.random() - 0.5) * variation)) : undefined,
-    users: point.users ? Math.round(point.users * (1 + (Math.random() - 0.5) * variation)) : undefined,
-    conversions: point.conversions ? Math.round(point.conversions * (1 + (Math.random() - 0.5) * variation)) : undefined,
-  }));
-};
 
 export default function SaasDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [timeRange, setTimeRange] = useState("30d");
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d" | "1y">("30d");
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
-  const [revenueData, setRevenueData] = useState(REVENUE_DATA_BASE);
-  const [conversionData, setConversionData] = useState(CONVERSION_DATA_BASE);
-  const [trafficData, setTrafficData] = useState(TRAFFIC_DATA_BASE);
-  const [metrics, setMetrics] = useState<DashboardMetric[]>([]);
   const [animationKey, setAnimationKey] = useState(0);
 
-  // Initialize metrics
-  useEffect(() => {
-    const initialMetrics: DashboardMetric[] = [
-      {
-        label: "Total Revenue",
-        value: "$45,231.89",
-        change: 20.1,
-        icon: <DollarSign className="w-6 h-6" />,
-        color: "bg-blue-50 text-blue-600",
-      },
-      {
-        label: "Active Users",
-        value: "12,543",
-        change: 15.3,
-        icon: <Users className="w-6 h-6" />,
-        color: "bg-green-50 text-green-600",
-      },
-      {
-        label: "Conversion Rate",
-        value: "3.24%",
-        change: 4.3,
-        icon: <TrendingUp className="w-6 h-6" />,
-        color: "bg-purple-50 text-purple-600",
-      },
-      {
-        label: "System Status",
-        value: "99.8%",
-        change: 0.1,
-        icon: <Activity className="w-6 h-6" />,
-        color: "bg-orange-50 text-orange-600",
-      },
-    ];
-    setMetrics(initialMetrics);
-  }, []);
+  // Get data based on selected time range
+  const currentData = DATA_BY_RANGE[timeRange];
 
   // Real-time data update effect
   useEffect(() => {
     const interval = setInterval(() => {
-      // Update chart data with slight variations
-      setRevenueData(addVariation(REVENUE_DATA_BASE, 0.08));
-      setConversionData(addVariation(CONVERSION_DATA_BASE, 0.12));
-      setTrafficData(addVariation(TRAFFIC_DATA_BASE, 0.1));
-      
-      // Update metrics with slight variations
-      setMetrics((prevMetrics) =>
-        prevMetrics.map((metric) => {
-          const changeVariation = (Math.random() - 0.5) * 2;
-          return {
-            ...metric,
-            change: Math.max(0, metric.change + changeVariation),
-          };
-        })
-      );
-
-      // Trigger animation key change for smooth transitions
       setAnimationKey((prev) => prev + 1);
-    }, 3000); // Update every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const metrics: DashboardMetric[] = [
+    {
+      label: "Total Revenue",
+      value: currentData.metrics.revenue,
+      change: currentData.metrics.revenueChange,
+      icon: <DollarSign className="w-6 h-6" />,
+      color: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Active Users",
+      value: currentData.metrics.users,
+      change: currentData.metrics.usersChange,
+      icon: <Users className="w-6 h-6" />,
+      color: "bg-green-50 text-green-600",
+    },
+    {
+      label: "Conversion Rate",
+      value: currentData.metrics.conversion,
+      change: currentData.metrics.conversionChange,
+      icon: <TrendingUp className="w-6 h-6" />,
+      color: "bg-purple-50 text-purple-600",
+    },
+    {
+      label: "System Status",
+      value: currentData.metrics.status,
+      change: currentData.metrics.statusChange,
+      icon: <Activity className="w-6 h-6" />,
+      color: "bg-orange-50 text-orange-600",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -248,24 +315,35 @@ export default function SaasDashboard() {
                   Dashboard
                 </h1>
                 <p className="text-muted-foreground">
-                  Welcome back! Here's your performance overview. Data updates every 3 seconds.
+                  Performance overview for the selected period
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg hover:bg-secondary transition-colors">
-                  <Calendar className="w-4 h-4" />
-                  <select
-                    value={timeRange}
-                    onChange={(e) => setTimeRange(e.target.value)}
-                    className="bg-transparent outline-none text-sm font-medium"
-                  >
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d">Last 30 days</option>
-                    <option value="90d">Last 90 days</option>
-                    <option value="1y">Last year</option>
-                  </select>
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-colors">
+                {/* Time Range Selector - Redesigned */}
+                <div className="flex items-center gap-2 bg-card border border-border rounded-lg p-1">
+                  {(["7d", "30d", "90d", "1y"] as const).map((range) => (
+                    <button
+                      key={range}
+                      onClick={() => setTimeRange(range)}
+                      className={`px-4 py-2 rounded-md font-medium text-sm transition-all ${
+                        timeRange === range
+                          ? "bg-accent text-accent-foreground shadow-md"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      {range === "7d"
+                        ? "Last 7 Days"
+                        : range === "30d"
+                        ? "Last 30 Days"
+                        : range === "90d"
+                        ? "Last 90 Days"
+                        : "Last Year"}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Export Button - Redesigned */}
+                <button className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-all font-medium shadow-sm hover:shadow-md">
                   <Download className="w-4 h-4" />
                   Export
                 </button>
@@ -278,7 +356,7 @@ export default function SaasDashboard() {
                 <button
                   key={index}
                   onClick={() => setSelectedMetric(metric.label)}
-                  className={`p-6 rounded-lg border transition-all duration-500 cursor-pointer transform hover:scale-105 ${
+                  className={`p-6 rounded-lg border transition-all duration-300 cursor-pointer transform hover:scale-105 ${
                     selectedMetric === metric.label
                       ? "border-accent bg-accent/5 shadow-lg"
                       : "border-border hover:border-accent/50"
@@ -312,7 +390,7 @@ export default function SaasDashboard() {
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart
-                    data={revenueData}
+                    data={currentData.revenue}
                     key={`revenue-${animationKey}`}
                   >
                     <defs>
@@ -379,7 +457,7 @@ export default function SaasDashboard() {
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart
-                    data={conversionData}
+                    data={currentData.conversion}
                     key={`conversion-${animationKey}`}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
@@ -408,12 +486,12 @@ export default function SaasDashboard() {
               {/* Weekly Traffic */}
               <div className="bg-card border border-border rounded-lg p-6">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-lg font-bold">Weekly Traffic</h2>
+                  <h2 className="text-lg font-bold">Traffic</h2>
                   <div className="animate-pulse w-2 h-2 bg-green-500 rounded-full" />
                 </div>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
-                    data={trafficData}
+                    data={currentData.traffic}
                     key={`traffic-${animationKey}`}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
