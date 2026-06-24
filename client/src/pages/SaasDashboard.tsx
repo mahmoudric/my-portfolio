@@ -265,7 +265,7 @@ export default function SaasDashboard() {
                     <option value="1y">Last year</option>
                   </select>
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-colors" style={{borderRadius: '7px', paddingLeft: '10px', paddingRight: '122px'}}>
+                <button className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent/90 text-accent-foreground rounded-lg transition-colors">
                   <Download className="w-4 h-4" />
                   Export
                 </button>
