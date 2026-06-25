@@ -100,6 +100,7 @@ export default function Home() {
                 <Button 
                   className="bg-accent hover:bg-accent/90 text-accent-foreground"
                   size="lg"
+                  onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   View My Work <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
